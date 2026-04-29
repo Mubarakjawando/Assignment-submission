@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Assignment Submission System</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="container">
+    <!--
+    <h1> Assignment Submission System</h1>
+    <p class="subtitle">Computer Science Department</p>
+    -->
+
+    <!-- Tab Buttons -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('register')">Register</button>
+      <button class="tab-btn" onclick="showTab('login')">Login</button>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="register" class="form-box">
+      <h2>Student Registration</h2>
+
+      <input type="text" id="reg-name" placeholder="Full Name" />
+      <input type="email" id="reg-email" placeholder="Email Address" />
+      <input type="text" id="reg-matric" placeholder="00/000/0000" />
+
+
+      <label for="reg-level">Select Your Level</label>
+      <select id="reg-level">
+        <option value="">-- Select Level --</option>
+        <option value="ND1">ND 1</option>
+        <option value="ND2">ND 2</option>
+        <option value="HND1">HND 1</option>
+        <option value="HND2">HND 2</option>
+        
+      </select>
+
+      <input type="password" id="reg-password" placeholder="Password" />
+      <input type="password" id="reg-confirm" placeholder="Confirm Password" />
+
+      <button onclick="registerStudent()">Register</button>
+      <p id="reg-message" class="message"></p>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="login" class="form-box hidden">
+      <h2>Login</h2>
+
+      <input type="email" id="login-email" placeholder="Email Address" />
+      <input type="password" id="login-password" placeholder="Password" />
+
+      <button onclick="loginUser()">Login</button>
+      <p id="login-message" class="message"></p>
+    </div>
+
+  </div>
+
+  <!-- Supabase DB -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

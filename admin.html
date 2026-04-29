@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    body { background: #0f172a; min-height: 100vh; padding: 20px; }
+    .dashboard { max-width: 950px; margin: 0 auto; }
+
+    .top-bar {
+      background: linear-gradient(135deg, #1e293b, #334155);
+      color: white;
+      padding: 20px 24px;
+      border-radius: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      border: 1px solid #334155;
+    }
+
+    .top-bar h2 { font-size: 20px; }
+    .top-bar span { font-size: 13px; opacity: 0.7; margin-top: 4px; display: block; }
+
+    .logout-btn {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 10px 20px;
+      border: 2px solid #166534;
+      background: #1e293b;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      color: #94a3b8;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn:hover:not(.active) {
+      border-color: #22c55e;
+      color: #22c55e;
+      transform: translateY(-1px);
+    }
+
+    .tab-btn.active {
+      background: #16a34a;
+      border-color: #16a34a;
+      color: white;
+    }
+
+    .card {
+      background: #1e293b;
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 20px;
+      border: 1px solid #334155;
+    }
+
+    .card h3 {
+      font-size: 16px;
+      margin-bottom: 18px;
+      color: white;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 11px;
+      margin-bottom: 14px;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      background: #0f172a;
+      color: white;
+    }
+
+    input:focus, select:focus { border-color: #22c55e; }
+    input::placeholder { color: #64748b; }
+
+    select option { background: #1e293b; }
+
+    .btn {
+      background: #16a34a;
+      color: white;
+      border: none;
+      padding: 11px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover { 
+      background: #15803d;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+    }
+    .btn-red { background: #ef4444; }
+    .btn-red:hover { background: #dc2626; }
+    .btn-green { background: #22c55e; }
+    .btn-green:hover { background: #16a34a; }
+
+    .btn-small {
+      padding: 6px 14px;
+      font-size: 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      color: white;
+    }
+
+    .stats-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 16px 20px;
+      flex: 1;
+      min-width: 120px;
+      text-align: center;
+    }
+
+    .stat-card h3 { font-size: 28px; color: #22c55e; }
+    .stat-card p { font-size: 12px; color: #64748b; margin-top: 4px; }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      background: #0f172a;
+      color: #94a3b8;
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #1e293b;
+      color: #e2e8f0;
+    }
+
+    tr:hover td { background: #0f172a; }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-lecturer { background: #312e81; color: #a5b4fc; }
+    .badge-student { background: #14532d; color: #86efac; }
+    .badge-level { background: #1e3a5f; color: #93c5fd; }
+
+    .message { margin-top: 12px; font-size: 14px; font-weight: 500; }
+    .success { color: #4ade80; }
+    .error { color: #f87171; }
+    .hidden { display: none; }
+    .loading { text-align: center; padding: 30px; color: #64748b; }
+    .empty { text-align: center; padding: 30px; color: #475569; }
+
+    /* Login Screen */
+    .login-screen {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: -20px;
+    }
+
+    .login-box {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .login-box h2 {
+      color: white;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 22px;
+    }
+
+    .login-box p {
+      color: #64748b;
+      text-align: center;
+      font-size: 13px;
+      margin-bottom: 28px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .form-row input,
+    .form-row select {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <div class="login-screen" id="login-screen">
+    <div class="login-box">
+      <h2> Admin Panel</h2>
+      <p>Assignment Submission System</p>
+      <input type="email" id="admin-email" placeholder="Admin Email"/>
+      <input type="password" id="admin-password" placeholder="Admin Password"/>
+      <button class="btn" style="width:100%" onclick="adminLogin()">Login as Admin</button>
+      <p id="login-msg" class="message" style="text-align:center;margin-top:12px;"></p>
+    </div>
+  </div>
+
+  <!-- MAIN DASHBOARD -->
+  <div class="dashboard hidden" id="main-dashboard">
+
+    <div class="top-bar">
+      <div>
+        <h2> Admin Panel</h2>
+        <span>Assignment Submission System — Full Control</span>
+      </div>
+      <button class="logout-btn" onclick="adminLogout()">Logout</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <h3 id="stat-students">0</h3>
+        <p>Students</p>
+      </div>
+      <div class="stat-card">
+        <h3 id="stat-lecturers">0</h3>
+        <p>Lecturers</p>
+      </div>
+      <div class="stat-card">
+        <h3 id="stat-assignments">0</h3>
+        <p>Assignments</p>
+      </div>
+      <div class="stat-card">
+        <h3 id="stat-submissions">0</h3>
+        <p>Submissions</p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('add-lecturer', this)">Add Lecturer</button>
+      <button class="tab-btn" onclick="showTab('lecturers', this)">All Lecturers</button>
+      <button class="tab-btn" onclick="showTab('students', this)"> All Students</button>
+      <button class="tab-btn" onclick="showTab('courses', this)">Courses</button>
+      <button class="tab-btn" onclick="showTab('assignments', this)"> Assignments</button>
+    </div>
+
+    <!-- ADD LECTURER TAB -->
+    <div id="add-lecturer" class="tab-content">
+      <div class="card">
+        <h3> Add New Lecturer</h3>
+        <div class="form-row">
+          <input type="text" id="lec-name" placeholder="Full Name (e.g. Dr. John Smith)"/>
+          <input type="email" id="lec-email" placeholder="Email Address"/>
+        </div>
+        <input type="password" id="lec-password" placeholder="Temporary Password"/>
+        <button class="btn" onclick="addLecturer()">Create Lecturer Account</button>
+        <p id="lec-msg" class="message"></p>
+      </div>
+
+      <div class="card">
+        <h3> Assign Lecturer to Course</h3>
+        <select id="assign-lecturer">
+          <option value="">-- Select Lecturer --</option>
+        </select>
+        <select id="assign-course">
+          <option value="">-- Select Course --</option>
+        </select>
+        <button class="btn btn-green" onclick="assignCourse()">Assign Course</button>
+        <p id="assign-msg" class="message"></p>
+      </div>
+    </div>
+
+    <!-- ALL LECTURERS TAB -->
+    <div id="lecturers" class="tab-content hidden">
+      <div class="card">
+        <h3>All Lecturers</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Courses</th></tr>
+            </thead>
+            <tbody id="lecturers-table">
+              <tr><td colspan="3" class="loading">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL STUDENTS TAB -->
+    <div id="students" class="tab-content hidden">
+      <div class="card">
+        <h3> All Registered Students</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Matric No.</th>
+                <th>Level</th>
+                <th>Registered</th>
+              </tr>
+            </thead>
+            <tbody id="students-table">
+              <tr><td colspan="5" class="loading">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- COURSES TAB -->
+    <div id="courses" class="tab-content hidden">
+      <div class="card">
+        <h3> All Courses</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Course Name</th>
+                <th>Level</th>
+                <th>Lecturer</th>
+              </tr>
+            </thead>
+            <tbody id="courses-table">
+              <tr><td colspan="4" class="loading">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ASSIGNMENTS TAB -->
+    <div id="assignments" class="tab-content hidden">
+      <div class="card">
+        <h3> All Assignments</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Course</th>
+                <th>Level</th>
+                <th>Deadline</th>
+                <th>Submissions</th>
+              </tr>
+            </thead>
+            <tbody id="assignments-table">
+              <tr><td colspan="5" class="loading">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+  var adminUser = null;
+
+  async function adminLogin() {
+    var email = document.getElementById('admin-email').value.trim();
+    var password = document.getElementById('admin-password').value;
+    var msg = document.getElementById('login-msg');
+
+    if (!email || !password) {
+      msg.textContent = 'Please enter email and password.';
+      msg.className = 'message error';
+      return;
+    }
+
+    var result = await supabaseClient.auth.signInWithPassword({
+      email: email, password: password
+    });
+
+    if (result.error) {
+      msg.textContent = 'Error: ' + result.error.message;
+      msg.className = 'message error';
+      return;
+    }
+
+    // Check if user is a lecturer (admin uses lecturer role for now)
+    var profile = await supabaseClient
+      .from('users')
+      .select('*')
+      .eq('id', result.data.user.id)
+      .single();
+
+    if (!profile.data || (profile.data.role !== 'admin' && profile.data.role !== 'lecturer')) {
+      msg.textContent = 'Access denied. Admins only.';
+      msg.className = 'message error';
+      await supabaseClient.auth.signOut();
+      return;
+    }
+
+    adminUser = profile.data;
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('main-dashboard').classList.remove('hidden');
+
+    loadStats();
+    loadLecturers();
+    loadStudents();
+    loadCourses();
+    loadAssignments();
+    loadLecturerDropdown();
+    loadCourseDropdown();
+  }
+
+  async function adminLogout() {
+    await supabaseClient.auth.signOut();
+    window.location.reload();
+  }
+
+  function showTab(tabName, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabName).classList.remove('hidden');
+    btn.classList.add('active');
+  }
+
+  async function loadStats() {var students = await supabaseClient.from('users').select('id', {count:'exact'}).eq('role','student');
+    var lecturers = await supabaseClient.from('users').select('id', {count:'exact'}).eq('role','lecturer');
+    var assignments = await supabaseClient.from('assignments').select('id', {count:'exact'});
+    var submissions = await supabaseClient.from('submissions').select('id', {count:'exact'});
+
+    document.getElementById('stat-students').textContent = students.count || 0;
+    document.getElementById('stat-lecturers').textContent = lecturers.count || 0;
+    document.getElementById('stat-assignments').textContent = assignments.count || 0;
+    document.getElementById('stat-submissions').textContent = submissions.count || 0;
+  }
+
+  async function loadLecturers() {
+    var tbody = document.getElementById('lecturers-table');
+    var result = await supabaseClient
+      .from('users')
+      .select('*, courses(name, code, level)')
+      .eq('role', 'lecturer')
+      .order('full_name');
+
+    if (result.error || result.data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="3" class="empty">No lecturers found.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = '';
+    result.data.forEach(function(l) {
+      var courses = l.courses && l.courses.length > 0
+        ? l.courses.map(function(c) {
+            return '<span class="badge badge-level">' + c.code + '</span> ';
+          }).join('')
+        : '<span style="color:#475569">No courses</span>';
+
+      tbody.innerHTML +=
+        '<tr>' +
+          '<td>' + l.full_name + '</td>' +
+          '<td>' + l.email + '</td>' +
+          '<td>' + courses + '</td>' +
+        '</tr>';
+    });
+  }
+
+  async function loadStudents() {
+    var tbody = document.getElementById('students-table');
+    var result = await supabaseClient
+      .from('users')
+      .select('*')
+      .eq('role', 'student')
+      .order('created_at', { ascending: false });
+
+    if (result.error || result.data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty">No students registered yet.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = '';
+    result.data.forEach(function(s) {
+      var date = new Date(s.created_at).toLocaleDateString();
+      tbody.innerHTML +=
+        '<tr>' +
+          '<td>' + s.full_name + '</td>' +
+          '<td>' + s.email + '</td>' +
+          '<td>' + (s.matric_number || '-') + '</td>' +
+          '<td><span class="badge badge-level">' + (s.level || '-') + '</span></td>' +
+          '<td>' + date + '</td>' +
+        '</tr>';
+    });
+  }
+
+  async function loadCourses() {
+    var tbody = document.getElementById('courses-table');
+    var result = await supabaseClient
+      .from('courses')
+      .select('*, users(full_name)')
+      .order('level')
+      .order('code');
+
+    if (result.error || result.data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="empty">No courses found.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = '';
+    result.data.forEach(function(c) {
+      tbody.innerHTML +=
+        '<tr>' +
+          '<td><code style="color:#a5b4fc">' + c.code + '</code></td>' +
+          '<td>' + c.name + '</td>' +
+          '<td><span class="badge badge-level">' + c.level + '</span></td>' +
+          '<td>' + (c.users ? c.users.full_name : '<span style="color:#ef4444">Unassigned</span>') + '</td>' +
+        '</tr>';
+    });
+  }
+
+  async function loadAssignments() {
+    var tbody = document.getElementById('assignments-table');
+    var result = await supabaseClient
+      .from('assignments')
+      .select('*, courses(name)')
+      .order('created_at', { ascending: false });
+
+    if (result.error || result.data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty">No assignments yet.</td></tr>';
+      return;
+    }
+
+    // Get submission counts
+    var subs = await supabaseClient.from('submissions').select('assignment_id');
+    var subCounts = {};
+    if (subs.data) {
+      subs.data.forEach(function(s) {
+        subCounts[s.assignment_id] = (subCounts[s.assignment_id] || 0) + 1;
+      });
+    }
+
+    tbody.innerHTML = '';
+    result.data.forEach(function(a) {
+      var count = subCounts[a.id] || 0;
+      tbody.innerHTML +=
+        '<tr>' +
+          '<td>' + a.title + '</td>' +
+          '<td>' + (a.courses ? a.courses.name : '-') + '</td>' +
+          '<td><span class="badge badge-level">' + a.level + '</span></td>' +
+          '<td>' + (a.deadline || 'No deadline') + '</td>' +
+          '<td>' + count + ' submission' + (count !== 1 ? 's' : '') + '</td>' +
+        '</tr>';
+    });
+  }
+
+  async function loadLecturerDropdown() {
+    var select = document.getElementById('assign-lecturer');
+    var result = await supabaseClient
+      .from('users')
+      .select('id, full_name')
+      .eq('role', 'lecturer')
+      .order('full_name');
+
+    if (result.error) return;
+    select.innerHTML = '<option value="">-- Select Lecturer --</option>';
+    result.data.forEach(function(l) {
+      select.innerHTML += '<option value="' + l.id + '">' + l.full_name + '</option>';
+    });
+  }
+
+  async function loadCourseDropdown() {
+    var select = document.getElementById('assign-course');
+    var result = await supabaseClient
+      .from('courses')
+      .select('id, name, code, level')
+      .order('level')
+      .order('code');
+
+    if (result.error) return;
+    select.innerHTML = '<option value="">-- Select Course --</option>';
+    result.data.forEach(function(c) {
+      select.innerHTML +=
+        '<option value="' + c.id + '">' + c.code + ' — ' + c.name + ' (' + c.level + ')</option>';
+    });
+  }
+
+  async function addLecturer() {
+    var name = document.getElementById('lec-name').value.trim();
+    var email = document.getElementById('lec-email').value.trim();
+    var password = document.getElementById('lec-password').value;
+    var msg = document.getElementById('lec-msg');
+
+    if (!name , !email , !password) {
+      msg.textContent = 'Please fill in all fields.';
+      msg.className = 'message error';
+      return;
+    }
+
+    if (password.length < 6) {
+      msg.textContent = 'Password must be at least 6 characters.';
+      msg.className = 'message error';
+      return;
+    }
+
+    msg.textContent = 'Creating account...';
+    msg.className = 'message';
+
+    // Sign up the lecturer
+    var result = await supabaseClient.auth.signUp({
+      email: email,
+      password: password
+    });
+
+    if (result.error) {
+      msg.textContent = 'Error: ' + result.error.message;
+      msg.className = 'message error';
+      return;
+    }
+
+    // Insert into users table
+    var insert = await supabaseClient.from('users').insert([{
+      id: result.data.user.id,
+      full_name: name,
+      email: email,
+      role: 'lecturer',
+      level: null
+    }]);
+
+    if (insert.error) {
+      msg.textContent = 'Error saving profile: ' + insert.error.message;
+      msg.className = 'message error';
+      return;
+    }
+
+    msg.textContent = ' Lecturer account created successfully!';
+    msg.className = 'message success';
+
+    document.getElementById('lec-name').value = '';
+    document.getElementById('lec-email').value = '';
+    document.getElementById('lec-password').value = '';
+
+    loadStats();
+    loadLecturers();
+    loadLecturerDropdown();
+  }
+
+  async function assignCourse() {
+    var lecturerId = document.getElementById('assign-lecturer').value;
+    var courseId = document.getElementById('assign-course').value;
+    var msg = document.getElementById('assign-msg');
+
+    if (!lecturerId || !courseId) {
+      msg.textContent = 'Please select both a lecturer and a course.';
+      msg.className = 'message error';
+      return;
+    }
+
+    var update = await supabaseClient
+      .from('courses')
+      .update({ lecturer_id: lecturerId })
+      .eq('id', courseId);
+
+    if (update.error) {
+      msg.textContent = 'Error: ' + update.error.message;
+      msg.className = 'message error';
+      return;
+    }
+
+    msg.textContent = ' Course assigned successfully!';
+    msg.className = 'message success';
+
+    loadCourses();
+    loadLecturers();
+  }
+</script>
+
+</body>
+</html>
