@@ -1,3 +1,25 @@
+/* Light Mode (Default) - Green and White */
+:root {
+  --primary: #16a34a;
+  --primary-hover: #15803d;
+  --bg: #f0f4f8;
+  --surface: #ffffff;
+  --text: #1a1a2e;
+  --text-muted: #666666;
+  --border: #e5e5e5;
+}
+
+/* Dark Mode - Dark Gray and Green */
+[data-theme="dark"] {
+  --primary: #22c55e;
+  --primary-hover: #16a34a;
+  --bg: #1e293b;
+  --surface: #334155;
+  --text: #f0f4f8;
+  --text-muted: #94a3b8;
+  --border: #475569;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -6,32 +28,34 @@
 }
 
 body {
-  background: #f0f4f8;
+  background: var(--bg);
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   padding: 20px;
+  transition: background 0.3s, color 0.3s;
 }
 
 .container {
-  background: white;
+  background: var(--surface);
   padding: 40px;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   width: 100%;
   max-width: 450px;
+  transition: background 0.3s;
 }
 
 h1 {
   text-align: center;
-  color: #1a1a2e;
+  color: var(--text);
   font-size: 22px;
 }
 
 .subtitle {
   text-align: center;
-  color: #666;
+  color: var(--text-muted);
   font-size: 13px;
   margin-bottom: 24px;
 }
@@ -39,7 +63,7 @@ h1 {
 .tabs {
   display: flex;
   margin-bottom: 24px;
-  border-bottom: 2px solid #eee;
+  border-bottom: 2px solid var(--border);
 }
 
 .tab-btn {
@@ -49,24 +73,24 @@ h1 {
   background: none;
   cursor: pointer;
   font-size: 15px;
-  color: #888;
+  color: var(--text-muted);
   font-weight: 600;
   transition: all 0.3s ease;
 }
 
 .tab-btn:hover {
-  color: #16a34a;
+  color: var(--primary);
   transform: translateY(-1px);
 }
 
 .tab-btn.active {
-  color: #16a34a;
-  border-bottom: 3px solid #16a34a;
+  color: var(--primary);
+  border-bottom: 3px solid var(--primary);
 }
 
 .form-box h2 {
   margin-bottom: 20px;
-  color: #1a1a2e;
+  color: var(--text);
   font-size: 18px;
 }
 
@@ -74,21 +98,23 @@ input, select {
   width: 100%;
   padding: 12px;
   margin-bottom: 14px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 14px;
   outline: none;
   transition: border 0.3s;
+  background: var(--surface);
+  color: var(--text);
 }
 
 input:focus, select:focus {
-  border-color: #16a34a;
+  border-color: var(--primary);
 }
 
 button {
   width: 100%;
   padding: 13px;
-  background: #16a34a;
+  background: var(--primary);
   color: white;
   border: none;
   border-radius: 8px;
@@ -100,7 +126,7 @@ button {
 }
 
 button:hover {
-  background: #15803d;
+  background: var(--primary-hover);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
 }
@@ -112,7 +138,7 @@ button:hover {
   font-weight: 500;
 }
 
-.message.success { color: green; }
-.message.error { color: red; }
+.message.success { color: #16a34a; }
+.message.error { color: #ef4444; }
 
 .hidden { display: none; }
