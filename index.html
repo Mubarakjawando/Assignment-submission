@@ -47,15 +47,42 @@
     </div>
 
     <!-- LOGIN FORM -->
-    <div id="login" class="form-box hidden">
-      <h2>Login</h2>
+<div id="login" class="form-box hidden">
+  <h2>Login</h2>
 
-      <input type="email" id="login-email" placeholder="Email Address" />
-      <input type="password" id="login-password" placeholder="Password" />
+  <div id="login-section">
+    <input type="email" id="login-email" placeholder="Email Address"/>
+    <input type="password" id="login-password" placeholder="Password"/>
+    <button onclick="loginUser()">Login</button>
+    <p style="text-align:center;margin-top:12px;">
+      <p style="text-align:center;margin-top:12px;">
+  <button onclick="showForgotPassword()" 
+    style="background:none;border:none;color:#4f46e5;font-size:13px;cursor:pointer;text-decoration:underline;width:auto;padding:0;">
+     Forgot Password?
+  </button>
+</p>
+    </p>
+    <p id="login-message" class="message"></p>
+  </div>
 
-      <button onclick="loginUser()">Login</button>
-      <p id="login-message" class="message"></p>
-    </div>
+  <!-- FORGOT PASSWORD SECTION -->
+  <div id="forgot-section" style="display:none;">
+    <h3 style="margin-bottom:16px;color:#1a1a2e;font-size:16px;"> Reset Password</h3>
+    <p style="font-size:13px;color:#666;margin-bottom:16px;">
+      Enter your email and we'll send you a password reset link.
+    </p>
+    <input type="email" id="reset-email" placeholder="Your Email Address"/>
+    <button onclick="sendResetEmail()">Send Reset Link</button>
+    <p style="text-align:center;margin-top:12px;">
+      <a href="#" onclick="showLogin()" 
+         style="color:#4f46e5;font-size:13px;text-decoration:none;">
+        ← Back to Login
+      </a>
+    </p>
+    <p id="reset-message" class="message"></p>
+  </div>
+
+</div>
 
   </div>
 
@@ -63,5 +90,46 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="script.js"></script>
+
+<script>
+function showForgotPassword() {
+  document.getElementById('login-section').style.display = 'none';
+  document.getElementById('forgot-section').style.display = 'block';
+  document.getElementById('reset-message').textContent = '';
+}
+
+function showLogin() {
+  document.getElementById('forgot-section').style.display = 'none';
+  document.getElementById('login-section').style.display = 'block';
+  document.getElementById('login-message').textContent = '';
+}
+
+async function sendResetEmail() {
+  var email = document.getElementById('reset-email').value.trim();
+  var msg = document.getElementById('reset-message');
+
+  if (!email) {
+    msg.textContent = 'Please enter your email.';
+    msg.className = 'message error';
+    return;
+  }
+
+  msg.textContent = 'Sending...';
+  msg.className = 'message';
+
+  var result = await supabaseClient.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/reset-password.html'
+  });
+
+  if (result.error) {
+    msg.textContent = 'Error: ' + result.error.message;
+    msg.className = 'message error';
+    return;
+  }
+
+  msg.textContent = 'Reset link sent! Check your email.';
+  msg.className = 'message success';
+}
+</script>
 </body>
 </html>
