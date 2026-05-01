@@ -96,4 +96,56 @@ async function loginUser() {
     msg.textContent = 'Error: ' + err.message;
     msg.className = 'message error';
   }
+
+  function showForgotPassword() {
+  document.getElementById('login-section').style.display = 'none';
+  document.getElementById('forgot-section').style.display = 'block';
+  document.getElementById('reset-message').textContent = '';
+}
+
+function showLogin() {
+  document.getElementById('forgot-section').style.display = 'none';
+  document.getElementById('login-section').style.display = 'block';
+  document.getElementById('login-message').textContent = '';
+}
+
+async function sendResetEmail() {
+  var email = document.getElementById('reset-email').value.trim();
+  var msg = document.getElementById('reset-message');
+
+  if (!email) {
+    msg.textContent = 'Please enter your email address.';
+    msg.className = 'message error';
+    return;
+  }
+
+  msg.textContent = 'Sending reset link...';
+  msg.className = 'message';
+
+  var result = await supabaseClient.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/reset-password.html'
+  });
+
+  if (result.error) {
+    msg.textContent = 'Error: ' + result.error.message;
+    msg.className = 'message error';
+    return;
+  }
+
+  msg.textContent = '✅ Reset link sent! Check your email inbox.';
+  msg.className = 'message success';
+}
+function showForgotPassword() {
+  document.getElementById('login-section').style.display = 'none';
+  document.getElementById('forgot-section').style.display = 'block';
+  document.getElementById('reset-message').textContent = '';
+}
+
+function showLogin() {
+  document.getElementById('forgot-section').style.display = 'none';
+  document.getElementById('login-section').style.display = 'block';
+  document.getElementById('login-message').textContent = '';
+}
+
+
 }
