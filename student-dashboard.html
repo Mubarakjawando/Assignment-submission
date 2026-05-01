@@ -6,236 +6,494 @@
   <title>Student Dashboard</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-    body { background: #f0f4f8; padding: 20px; }
-    .dashboard { max-width: 800px; margin: 0 auto; }
 
+    :root {
+      --primary: #166534;
+      --primary-hover: #14532d;
+      --primary-light: #dcfce7;
+      --bg: #f0fdf4;
+      --surface: #ffffff;
+      --border: #bbf7d0;
+      --text: #14532d;
+      --text-muted: #4b7a5e;
+    }
+
+[data-theme="dark"] {
+      --primary: #22c55e;
+      --primary-hover: #16a34a;
+      --primary-light: #14532d;
+      --bg: #1e293b;
+      --surface: #334155;
+      --border: #166534;
+      --text: #f0fdf4;
+      --text-muted: #86efac;
+    }
+
+    body { background: var(--bg); color: var(--text); transition: all 0.3s; }
+    .dashboard { max-width: 860px; margin: 0 auto; padding: 16px; }
+
+    /* TOP BAR */
     .top-bar {
-      background: #16a34a;
+      background: var(--primary);
       color: white;
-      padding: 16px 24px;
+      padding: 14px 18px;
       border-radius: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
-    .top-bar h2 { font-size: 18px; margin: 0; }
-    .top-bar span { font-size: 13px; opacity: 0.85; }
+    .top-bar h2 { font-size: 17px; color: white; margin: 0; }
+    .top-bar span { font-size: 12px; opacity: 0.85; color: white; display: block; margin-top: 2px; }
+    .top-bar-right { display: flex; gap: 8px; align-items: center; }
+
+    .icon-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 7px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      width: auto;
+      line-height: 1;
+    }
 
     .logout-btn {
       background: white;
-      color: #16a34a;
-      border: 2px solid #16a34a;
-      padding: 8px 16px;
+      color: var(--primary);
+      border: none;
+      padding: 7px 14px;
       border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
       font-size: 13px;
       width: auto;
-      transition: all 0.3s ease;
     }
 
-    .logout-btn:hover {
-      background: #16a34a;
-      color: white;
+    /* DRAWER */
+    .drawer-overlay {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 998; display: none;
     }
 
+    .drawer-overlay.open { display: block; }
+
+    .drawer {
+      position: fixed; top: 0; left: -270px;
+      width: 250px; height: 100%;
+      background: var(--surface);
+      z-index: 999;
+      transition: left 0.3s ease;
+      overflow-y: auto;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+    }
+
+    .drawer.open { left: 0; }
+
+    .drawer-header {
+      background: var(--primary);
+      padding: 20px 16px;
+      position: relative;
+    }
+
+    .drawer-header h3 { color: white; font-size: 15px; }
+    .drawer-header p { color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 4px; }
+
+    .drawer-close {
+      position: absolute; top: 14px; right: 14px;
+      background: rgba(255,255,255,0.2);
+      border: none; color: white;
+      width: 28px; height: 28px;
+      border-radius: 50%; cursor: pointer;
+      font-size: 14px;
+    }
+
+    .drawer-nav { padding: 10px; }
+
+    .drawer-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; border-radius: 8px;
+      cursor: pointer; color: var(--text);
+      font-weight: 500; font-size: 14px;
+      margin-bottom: 4px; border: none;
+      background: none; width: 100%; text-align: left;
+      transition: background 0.2s;
+    }
+
+    .drawer-item:hover, .drawer-item.active {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .drawer-divider { height: 1px; background: var(--border); margin: 8px 14px; }
+
+    .drawer-logout {
+      margin: 10px;
+      background: #fee2e2; color: #991b1b;
+      border: none; padding: 12px 14px;
+      border-radius: 8px; cursor: pointer;
+      font-weight: 600; font-size: 14px;
+      width: calc(100% - 20px);
+      text-align: left;
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    /* STATS */
     .stats-bar {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
+      display: flex; gap: 10px;
+      margin-bottom: 18px; flex-wrap: wrap;
     }
 
     .stat-card {
-      background: white;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 16px 20px;
-      flex: 1;
-      min-width: 120px;
+      padding: 14px 16px;flex: 1; min-width: 90px;
       text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
-    .stat-card h3 { font-size: 28px; color: #22c55e; }
-    .stat-card p { font-size: 12px; color: #888; margin-top: 4px; }
+    .stat-card h3 { font-size: 24px; color: var(--primary); }
+    .stat-card p { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
 
-    .section-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #1a1a2e;
+    /* TABS */
+    .tabs {
+      display: flex; gap: 8px;
+      margin-bottom: 18px; flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 9px 16px;
+      border: 2px solid var(--primary);
+      background: var(--surface);
+      border-radius: 8px; cursor: pointer;
+      font-weight: 600; font-size: 13px;
+      color: var(--primary); transition: all 0.2s;
+      width: auto;
+    }
+
+    .tab-btn.active, .tab-btn:hover {
+      background: var(--primary); color: white;
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--surface);
+      border-radius: 12px; padding: 20px;
       margin-bottom: 16px;
-      margin-top: 8px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(22,101,52,0.06);
     }
 
+    .card h3 { font-size: 15px; margin-bottom: 14px; color: var(--text); }
+
+    /* COURSE SECTION */
     .course-section {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      background: var(--surface);
+      border-radius: 12px; padding: 18px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
     }
 
     .course-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 2px solid #f0f4f8;
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border);
     }
 
-    .course-header h3 { color: #1a1a2e; font-size: 16px; }
-    .course-header p { color: #888; font-size: 12px; margin-top: 2px; }
+    .course-header h3 { color: var(--text); font-size: 15px; }
+    .course-header p { color: var(--text-muted); font-size: 12px; margin-top: 2px; }
 
+    /* ASSIGNMENT CARD */
     .assignment-card {
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 16px;
-      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px;
+      margin-bottom: 10px;
     }
 
-    .assignment-card:last-child { margin-bottom: 0; }
-    .assignment-card h4 { color: #1a1a2e; margin-bottom: 6px; font-size: 15px; }
-    .assignment-card p { color: #666; font-size: 13px; margin-bottom: 8px; }
+    .assignment-card h4 { color: var(--text); margin-bottom: 5px; font-size: 14px; }
+    .assignment-card p { color: var(--text-muted); font-size: 13px; margin-bottom: 6px; }
 
     .badge {
       display: inline-block;
-      background: #ecfdf5;
-      color: #16a34a;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      margin-right: 6px;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+      margin-right: 4px; margin-bottom: 6px;
     }
 
-    .badge-lecturer {
-      background: #dcfce7;
-      color: #166534;
-    }
+    .badge-green { background: var(--primary-light); color: var(--primary); }
+    .badge-level { background: #dcfce7; color: #166534; }
 
-    .deadline {
-      font-size: 13px;
-      color: #ef4444;
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
+    [data-theme="dark"] .badge-level { background: #14532d; color: #4ade80; }
 
-    .deadline.safe { color: #16a34a; }
-
-    .submit-section { margin-top: 12px; }
-
-    .submit-section input[type="file"] {
-      width: 100%;
-      padding: 10px;
-      border: 2px dashed #d1d5db;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      background: #f9fafb;
-      cursor: pointer;
-      font-size: 13px;
-    }
-
-    .submit-btn {
-      background: #16a34a;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      width: auto;
-      transition: all 0.3s ease;
-    }
-
-    .submit-btn:hover { 
-      background: #15803d;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+    .deadline-ok { color: #16a34a; font-size: 13px; font-weight: 600; }
+    .deadline-soon { color: #d97706; font-size: 13px; font-weight: 600; }
+    .deadline-passed-text {
+      background: #fee2e2; color: #991b1b;
+      padding: 7px 12px; border-radius: 8px;
+      font-size: 13px; font-weight: 600;
+      display: inline-block; margin-top: 8px;
     }
 
     .submitted-badge {
       display: inline-block;
-      background: #dcfce7;
-      color: #16a34a;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
+      background: #dcfce7; color: #166534;
+      padding: 5px 12px; border-radius: 8px;
+      font-size: 13px; font-weight: 600;
     }
 
     .score-badge {
       display: inline-block;
-      background: #fef9c3;
-      color: #854d0e;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      margin-left: 8px;
+      background: #fef9c3; color: #854d0e;
+      padding: 5px 12px; border-radius: 8px;
+      font-size: 13px; font-weight: 600;
+      margin-left: 6px;
     }
 
     .pending-badge {
       display: inline-block;
-      background: #fff7ed;
-      color: #c2410c;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 13px;font-weight: 600;
-      margin-left: 8px;
+      background: #fff7ed; color: #c2410c;
+      padding: 5px 12px; border-radius: 8px;
+      font-size: 13px; font-weight: 600;
+      margin-left: 6px;
     }
 
-    .empty-state {
-      text-align: center;
-      padding: 40px;
-      color: #999;
+    .submit-section { margin-top: 10px; }
+
+    .submit-section input[type="file"] {
+      width: 100%; padding: 10px;
+      border: 2px dashed var(--border);
+      border-radius: 8px; margin-bottom: 8px;
+      background: var(--bg); cursor: pointer;
+      font-size: 13px; color: var(--text);
     }
 
-    .loading { text-align: center; padding: 40px; color: #666; }
+    .submit-btn {
+      background: var(--primary); color: white;
+      border: none; padding: 9px 18px;
+      border-radius: 8px; cursor: pointer;
+      font-size: 13px; font-weight: 600;
+      width: auto; transition: background 0.2s;
+    }
+
+    .submit-btn:hover { background: var(--primary-hover); }
+
+    /* GRADE REPORT TABLE */
+    .grade-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+    .grade-table th {
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 10px 12px;text-align: left; font-weight: 600;
+    }
+
+    [data-theme="dark"] .grade-table th { background: #14532d; color: #4ade80; }
+
+    .grade-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .grade-table tr:hover td { background: var(--bg); }
+
+    .grade-summary {
+      display: flex; gap: 12px;
+      margin-bottom: 18px; flex-wrap: wrap;
+    }
+
+    .grade-summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 18px;
+      flex: 1; min-width: 100px; text-align: center;
+    }
+
+    .grade-summary-card h3 { font-size: 22px; color: var(--primary); }
+    .grade-summary-card p { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+    /* PROFILE */
+    .profile-avatar {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white; font-size: 32px;
+      display: flex; align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    .profile-info {
+      text-align: center; margin-bottom: 24px;
+    }
+
+    .profile-info h3 { font-size: 18px; color: var(--text); }
+    .profile-info p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+    .divider {
+      height: 1px; background: var(--border);
+      margin: 16px 0;
+    }
+
+    input[type="text"], input[type="email"],
+    input[type="password"], select {
+      width: 100%; padding: 11px 14px;
+      margin-bottom: 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px; font-size: 14px;
+      outline: none;
+      background: var(--surface); color: var(--text);
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(22,101,52,0.1);
+    }
+
+    input::placeholder { color: var(--text-muted); }
+
+    .btn {
+      background: var(--primary); color: white;
+      border: none; padding: 11px 24px;
+      border-radius: 8px; cursor: pointer;
+      font-weight: 600; font-size: 14px;
+      width: 100%; transition: background 0.2s;
+    }
+
+    .btn:hover { background: var(--primary-hover); }
+
+    .message { margin-top: 12px; font-size: 14px; font-weight: 500; }
+    .success { color: #16a34a; }
+    .error { color: #ef4444; }
     .hidden { display: none; }
+    .loading { text-align: center; padding: 30px; color: var(--text-muted); }
+    .empty { text-align: center; padding: 30px; color: var(--text-muted); }
   </style>
 </head>
 <body>
 
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+
+<!-- SIDE DRAWER -->
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <h3> Student Portal</h3>
+    <p id="drawer-student-name">Loading...</p>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-nav">
+    <button class="drawer-item active" data-tab="assignments" onclick="switchTab('assignments', this)">
+      <span></span> Assignments
+    </button>
+    <button class="drawer-item" data-tab="grades" onclick="switchTab('grades', this)">
+      <span></span> Grade Report
+    </button>
+    <button class="drawer-item" data-tab="profile" onclick="switchTab('profile', this)">
+      <span></span> My Profile
+    </button>
+    <div class="drawer-divider"></div>
+    <button class="drawer-logout" onclick="logout()">
+      <span></span> Logout
+    </button>
+  </div>
+</div>
+
 <div class="dashboard">
 
-  <!-- Top Bar -->
+  <!-- TOP BAR -->
   <div class="top-bar">
     <div>
       <h2> Student Dashboard</h2>
       <span id="student-info">Loading...</span>
     </div>
-    <button class="logout-btn" onclick="logout()">Logout</button>
+    <div class="top-bar-right">
+      <button class="icon-btn" onclick="toggleTheme()" id="theme-btn" title="Toggle Dark Mode">🌙</button>
+      <button class="icon-btn" onclick="openDrawer()" title="Menu">☰</button>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
   </div>
 
-  <!-- Stats Bar -->
+  <!-- STATS BAR -->
   <div class="stats-bar">
-    <div class="stat-card">
-      <h3 id="stat-total">0</h3>
-      <p>Total Assignments</p>
-    </div>
-    <div class="stat-card">
-      <h3 id="stat-submitted">0</h3>
-      <p>Submitted</p>
-    </div>
-    <div class="stat-card">
-      <h3 id="stat-pending">0</h3>
-      <p>Pending</p>
-    </div>
-    <div class="stat-card">
-      <h3 id="stat-graded">0</h3>
-      <p>Graded</p>
+    <div class="stat-card"><h3 id="stat-total">0</h3><p>Total</p></div><div class="stat-card"><h3 id="stat-submitted">0</h3><p>Submitted</p></div>
+    <div class="stat-card"><h3 id="stat-pending">0</h3><p>Pending</p></div>
+    <div class="stat-card"><h3 id="stat-graded">0</h3><p>Graded</p></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('assignments', this)"> Assignments</button>
+    <button class="tab-btn" onclick="switchTab('grades', this)"> Grade Report</button>
+    <button class="tab-btn" onclick="switchTab('profile', this)"> My Profile</button>
+  </div>
+
+  <!-- ASSIGNMENTS TAB -->
+  <div id="tab-assignments">
+    <div id="assignments-container">
+      <div class="loading">Loading assignments...</div>
     </div>
   </div>
 
-  <!-- Assignments Section -->
-  <div class="section-title"> Your Assignments by Course</div>
-  <div id="assignments-container">
-    <div class="loading">Loading assignments...</div>
+  <!-- GRADE REPORT TAB -->
+  <div id="tab-grades" class="hidden">
+    <div class="grade-summary">
+      <div class="grade-summary-card"><h3 id="gs-total">0</h3><p>Total Assignments</p></div>
+      <div class="grade-summary-card"><h3 id="gs-submitted">0</h3><p>Submitted</p></div>
+      <div class="grade-summary-card"><h3 id="gs-graded">0</h3><p>Graded</p></div>
+      <div class="grade-summary-card"><h3 id="gs-average">-</h3><p>Average Score</p></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h3 style="margin:0;"> All Scores</h3>
+        <button class="submit-btn" onclick="exportGrades()"> Export CSV</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="grade-table">
+          <thead>
+            <tr>
+              <th>Course</th>
+              <th>Assignment</th>
+              <th>Submitted</th>
+              <th>Score</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="grade-table-body">
+            <tr><td colspan="5" class="loading">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE TAB -->
+  <div id="tab-profile" class="hidden">
+    <div class="card">
+      <div class="profile-avatar" id="profile-avatar">👤</div>
+      <div class="profile-info">
+        <h3 id="profile-name">Loading...</h3>
+        <p id="profile-email">...</p>
+        <p id="profile-matric">...</p>
+      </div>
+
+      <div class="divider"></div>
+      <h3 style="margin-bottom:14px;"> Edit Profile</h3>
+      <input type="text" id="edit-name" placeholder="Full Name"/>
+      <button class="btn" onclick="updateProfile()">Save Changes</button>
+      <p id="profile-msg" class="message"></p>
+
+      <div class="divider"></div>
+      <h3 style="margin-bottom:14px;"> Change Password</h3>
+      <input type="password" id="new-pass" placeholder="New Password"/>
+      <input type="password" id="confirm-pass" placeholder="Confirm New Password"/>
+      <button class="btn" onclick="changePassword()">Update Password</button>
+      <p id="password-msg" class="message"></p>
+    </div>
   </div>
 
 </div>
@@ -245,128 +503,155 @@
 <script>
   var currentUser = null;
   var currentProfile = null;
+  var allAssignments = [];
+  var allSubmissions = [];
 
+  // ── THEME ──
+  function initTheme() {
+    var saved = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+    document.getElementById('theme-btn').textContent = saved === 'dark' ? '☀️' : '🌙';
+  }
+
+  function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme');
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    document.getElementById('theme-btn').textContent = next === 'dark' ? '☀️' : '🌙';
+  }
+
+  // ── DRAWER ──
+  function openDrawer() {
+    document.getElementById('drawer').classList.add('open');
+    document.getElementById('drawer-overlay').classList.add('open');
+  }
+
+  function closeDrawer() {
+    document.getElementById('drawer').classList.remove('open');
+    document.getElementById('drawer-overlay').classList.remove('open');
+  }
+
+  // ── TABS ──
+  function switchTab(tabName, btn) {
+    document.querySelectorAll('[id^="tab-"]').forEach(function(t) { t.classList.add('hidden'); });
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('.drawer-item').forEach(function(b) { b.classList.remove('active'); });
+    document.getElementById('tab-' + tabName).classList.remove('hidden');
+    if (btn) btn.classList.add('active');
+    document.querySelectorAll('.drawer-item[data-tab="' + tabName + '"]').forEach(function(b) { b.classList.add('active'); });
+    if (tabName === 'grades') loadGradeReport();
+    if (tabName === 'profile') loadProfile();
+    closeDrawer();
+  }
+
+  // ── INIT ──
   window.onload = async function() {
+    initTheme();
     var session = await supabaseClient.auth.getSession();
-    if (!session.data.session) {
-      window.location.href = 'index.html';
-      return;
-    }
-
+    if (!session.data.session) { window.location.href = 'index.html'; return; }
     currentUser = session.data.session.user;
 
-    var profile = await supabaseClient
-      .from('users')
-      .select('*')
-      .eq('id', currentUser.id)
-      .single();
-
-    if (!profile.data || profile.data.role !== 'student') {
-      window.location.href = 'index.html';
-      return;
-    }
+    var profile = await supabaseClient.from('users').select('*').eq('id', currentUser.id).single();
+    if (!profile.data || profile.data.role !== 'student') { window.location.href = 'index.html'; return; }
 
     currentProfile = profile.data;
-    document.getElementById('student-info').textContent =
-      currentProfile.full_name + ' | ' + currentProfile.level +
-      ' | Matric: ' + currentProfile.matric_number;
+
+    var info = currentProfile.full_name + ' | ' + currentProfile.level + ' | ' + currentProfile.matric_number;
+    document.getElementById('student-info').textContent = info;
+    document.getElementById('drawer-student-name').textContent = info;
 
     loadAssignments();
   };
 
+  // ── LOAD ASSIGNMENTS ──
   async function loadAssignments() {
     var container = document.getElementById('assignments-container');
 
-    // Get all courses for student's level
     var coursesResult = await supabaseClient
-      .from('courses')
-      .select('*, users(full_name)')
-      .eq('level', currentProfile.level)
-      .order('code');
+      .from('courses').select('*, users(full_name)')
+      .eq('level', currentProfile.level).order('code');
 
-    if (coursesResult.error || coursesResult.data.length === 0) {
-      container.innerHTML = '<div class="empty-state">📭 No courses found for your level.</div>';
-      return;
-    }
-
-    // Get all assignments for student's level
     var assignmentsResult = await supabaseClient
-      .from('assignments')
-      .select('*, courses(name, code)')
+      .from('assignments').select('*, courses(name,code)')
       .eq('level', currentProfile.level)
       .order('created_at', { ascending: false });
 
-    if (assignmentsResult.error) {
-      container.innerHTML = '<div class="empty-state">Error loading assignments.</div>';
+    var subsResult = await supabaseClient
+      .from('submissions').select('*').eq('student_id', currentUser.id);
+
+    allAssignments = assignmentsResult.data || [];
+    allSubmissions = subsResult.data || [];
+
+    // Update stats
+    var graded = allSubmissions.filter(function(s) { return s.score !== null; }).length;
+    document.getElementById('stat-total').textContent = allAssignments.length;
+    document.getElementById('stat-submitted').textContent = allSubmissions.length;
+    document.getElementById('stat-pending').textContent = allAssignments.length - allSubmissions.length;
+    document.getElementById('stat-graded').textContent = graded;
+
+    if (!coursesResult.data || coursesResult.data.length === 0) {
+      container.innerHTML = '<div class="empty"> No courses found for your level.</div>';
       return;
     }
 
-    // Get all submissions by this student
-    var submissionsResult = await supabaseClient
-      .from('submissions')
-      .select('*')
-      .eq('student_id', currentUser.id);
-
-    var submissions = submissionsResult.data || [];
-    var assignments = assignmentsResult.data || [];
-
-    // Update stats
-    var submitted = submissions.length;
-    var graded = submissions.filter(function(s) { return s.score !== null; }).length;
-    document.getElementById('stat-total').textContent = assignments.length;
-    document.getElementById('stat-submitted').textContent = submitted;
-    document.getElementById('stat-pending').textContent = assignments.length - submitted;
-    document.getElementById('stat-graded').textContent = graded;
-
-    if (assignments.length === 0) {
-      container.innerHTML = '<div class="empty-state">📭 No assignments yet for your level.</div>';
+    if (allAssignments.length === 0) {
+      container.innerHTML = '<div class="empty"> No assignments yet for your level.</div>';
       return;
     }
 
     container.innerHTML = '';
+    var today = new Date();
 
-    // Group assignments by course
     coursesResult.data.forEach(function(course) {
-      var courseAssignments = assignments.filter(function(a) {
-        return a.course_id === course.id;
-      });
-
+      var courseAssignments = allAssignments.filter(function(a) { return a.course_id === course.id; });
       var lecturerName = course.users ? course.users.full_name : 'Unknown';
 
       var assignmentsHTML = '';
 
       if (courseAssignments.length === 0) {
-        assignmentsHTML = '<p style="color:#aaa;font-size:13px;text-align:center;padding:16px;">No assignments yet for this course.</p>';
+        assignmentsHTML = '<p style="color:var(--text-muted);font-size:13px;text-align:center;padding:14px;">No assignments yet.</p>';
       } else {
         courseAssignments.forEach(function(a) {
-          var submission = submissions.find(function(s) {
-            return s.assignment_id === a.id;
-          });
+          var submission = allSubmissions.find(function(s) { return s.assignment_id === a.id; });
 
+          // ── DEADLINE CHECK ──
           var deadlineHTML = '';
+          var isExpired = false;
+
           if (a.deadline) {
-            var today = new Date();
-            var deadline = new Date(a.deadline);
-            var isSafe = deadline > today;
-            deadlineHTML = '<div class="deadline ' + (isSafe ? 'safe' : '') + '"> Deadline: ' + a.deadline + '</div>';
+            var deadlineDate = new Date(a.deadline);
+            deadlineDate.setHours(23, 59, 59);
+            var daysLeft = Math.ceil((deadlineDate - today) / (1000 * 60 * 60 * 24));
+            isExpired = deadlineDate < today;
+
+            if (isExpired) {deadlineHTML = '<div class="deadline-passed-text">⛔ Deadline Passed (' + a.deadline + ')</div>';
+            } else if (daysLeft <= 2) {
+              deadlineHTML = '<p class="deadline-soon">⚠️ Due Soon: ' + a.deadline + ' (' + daysLeft + ' day' + (daysLeft !== 1 ? 's' : '') + ' left)</p>';
+            } else {
+              deadlineHTML = '<p class="deadline-ok"> Deadline: ' + a.deadline + '</p>';
+            }
           }
 
           var fileLink = a.file_url
-            ? '<a href="' + a.file_url + '" target="_blank" style="font-size:13px;color:#4f46e5;display:block;margin-bottom:8px;">📎 View Assignment File</a>'
+            ? '<a href="' + a.file_url + '" target="_blank" style="font-size:13px;color:var(--primary);display:block;margin-bottom:8px;">📎 View Assignment File</a>'
             : '';
 
+          // ── SUBMIT SECTION ──
           var submitHTML = '';
           if (submission) {
             var scoreHTML = submission.score !== null
-              ? '<span class="score-badge">🏆 Score: ' + submission.score + '/100</span>'
+              ? '<span class="score-badge"> Score: ' + submission.score + '/100</span>'
               : '<span class="pending-badge">⏳ Awaiting Grade</span>';
-            submitHTML = '<div style="margin-top:10px;"><span class="submitted-badge"> Submitted</span>' + scoreHTML + '</div>';
+            submitHTML = '<div style="margin-top:8px;"><span class="submitted-badge"> Submitted</span>' + scoreHTML + '</div>';
+          } else if (isExpired) {
+            submitHTML = '<div class="deadline-passed-text" style="margin-top:8px;"> Submission Closed</div>';
           } else {
             submitHTML =
               '<div class="submit-section">' +
                 '<input type="file" id="file-' + a.id + '" accept=".pdf,image/*"/>' +
                 '<button class="submit-btn" onclick="submitAssignment(\'' + a.id + '\')"> Submit Assignment</button>' +
-                '<p id="msg-' + a.id + '" style="font-size:13px;margin-top:8px;"></p>' +
+                '<p id="msg-' + a.id + '" style="font-size:13px;margin-top:6px;"></p>' +
               '</div>';
           }
 
@@ -374,9 +659,7 @@
             '<div class="assignment-card">' +
               '<h4>' + a.title + '</h4>' +
               '<p>' + (a.description || 'No description.') + '</p>' +
-              deadlineHTML +
-              fileLink +
-              submitHTML +
+              deadlineHTML + fileLink + submitHTML +
             '</div>';
         });
       }
@@ -385,16 +668,17 @@
         '<div class="course-section">' +
           '<div class="course-header">' +
             '<div>' +
-              '<h3> ' + course.name + '</h3>' +
+              '<h3>📖 ' + course.name + '</h3>' +
               '<p>' + course.code + ' | Lecturer: ' + lecturerName + '</p>' +
             '</div>' +
-            '<span class="badge">' + courseAssignments.length + ' assignment' + (courseAssignments.length !== 1 ? 's' : '') + '</span>' +
+            '<span class="badge badge-green">' + courseAssignments.length + ' assignment' + (courseAssignments.length !== 1 ? 's' : '') + '</span>' +
           '</div>' +
           assignmentsHTML +
         '</div>';
     });
   }
 
+  // ── SUBMIT ASSIGNMENT ──
   async function submitAssignment(assignmentId) {
     var fileInput = document.getElementById('file-' + assignmentId);
     var msg = document.getElementById('msg-' + assignmentId);
@@ -405,43 +689,164 @@
       return;
     }
 
+    msg.textContent = 'Uploading...';
+    msg.style.color = 'var(--primary)';
+
     var file = fileInput.files[0];
     var fileName = currentUser.id + '-' + assignmentId + '-' + Date.now() + '-' + file.name;
 
-    msg.textContent = 'Uploading...';
-    msg.style.color = '#4f46e5';
+    var upload = await supabaseClient.storage.from('submissions').upload(fileName, file);
+    if (upload.error) { msg.textContent = 'Error: ' + upload.error.message; msg.style.color = 'red'; return; }
 
-    var upload = await supabaseClient.storage
-      .from('submissions')
-      .upload(fileName, file);
+    var fileUrl = supabaseClient.storage.from('submissions').getPublicUrl(fileName).data.publicUrl;
 
-    if (upload.error) {
-      msg.textContent = 'Upload error: ' + upload.error.message;
-      msg.style.color = 'red';
-      return;
-    }
+    var insert = await supabaseClient.from('submissions').insert([{
+      student_id: currentUser.id,
+      assignment_id: assignmentId,
+      file_url: fileUrl
+    }]);
 
-    var urlData = supabaseClient.storage
-      .from('submissions')
-      .getPublicUrl(fileName);
-
-    var insert = await supabaseClient
-      .from('submissions')
-      .insert([{
-        student_id: currentUser.id,
-        assignment_id: assignmentId,
-        file_url: urlData.data.publicUrl
-      }]);
-
-    if (insert.error) {
-      msg.textContent = 'Error: ' + insert.error.message;
-      msg.style.color = 'red';
-      return;
-    }
+    if (insert.error) { msg.textContent = 'Error: ' + insert.error.message; msg.style.color = 'red'; return; }
 
     msg.textContent = ' Submitted!';
     msg.style.color = 'green';
     setTimeout(loadAssignments, 1500);
+  }
+
+  // ── GRADE REPORT ──
+  async function loadGradeReport() {
+    var tbody = document.getElementById('grade-table-body');
+    tbody.innerHTML = '<tr><td colspan="5" class="loading">Loading...</td></tr>';
+
+    var assignmentsResult = await supabaseClient
+      .from('assignments').select('*, courses(name)')
+      .eq('level', currentProfile.level)
+      .order('created_at', { ascending: false });
+
+    var subsResult = await supabaseClient
+      .from('submissions').select('*').eq('student_id', currentUser.id);
+
+    var assignments = assignmentsResult.data || [];
+    var submissions = subsResult.data || [];
+
+    var totalAssignments = assignments.length;
+    var submitted = submissions.length;
+    var graded = submissions.filter(function(s) { return s.score !== null; }).length;
+    var scores = submissions.filter(function(s) { return s.score !== null; }).map(function(s) { return s.score; });
+    var average = scores.length > 0 ? Math.round(scores.reduce(function(a, b) { return a + b; }, 0) / scores.length) : null;
+
+    document.getElementById('gs-total').textContent = totalAssignments;
+    document.getElementById('gs-submitted').textContent = submitted;
+    document.getElementById('gs-graded').textContent = graded;
+    document.getElementById('gs-average').textContent = average !== null ? average + '%' : '-';
+
+    if (assignments.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty">No assignments yet.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = '';
+    assignments.forEach(function(a) {
+      var sub = submissions.find(function(s) { return s.assignment_id === a.id; });
+      var courseName = a.courses ? a.courses.name : '-';
+      var submittedDate = sub ? new Date(sub.submitted_at).toLocaleDateString() : '-';
+
+      var scoreCell = '-';
+      var statusCell = '<span style="color:#d97706;font-weight:600;">Not Submitted</span>';
+
+      if (sub) {
+        statusCell = '<span style="color:#16a34a;font-weight:600;">Submitted</span>';
+        if (sub.score !== null) {
+          var color = sub.score >= 70 ? '#166534' : sub.score >= 50 ? '#d97706' : '#ef4444';
+          scoreCell = '<strong style="color:' + color + ';">' + sub.score + '/100</strong>';
+          statusCell = '<span style="color:#166534;font-weight:600;">Graded </span>';
+        } else {
+          scoreCell = '<span style="color:#94a3b8;">Pending</span>';
+        }
+      }
+
+      tbody.innerHTML +=
+        '<tr>' +
+          '<td>' + courseName + '</td>' +
+          '<td>' + a.title + '</td>' +
+          '<td>' + submittedDate + '</td>' +
+          '<td>' + scoreCell + '</td>' +
+          '<td>' + statusCell + '</td>' +
+        '</tr>';
+    });
+  }
+
+  // ── EXPORT GRADES CSV ──
+  function exportGrades() {
+    var rows = [['Course', 'Assignment', 'Submitted Date', 'Score', 'Status']];
+    var tbody = document.getElementById('grade-table-body');
+    var trs = tbody.querySelectorAll('tr');
+
+    trs.forEach(function(tr) {
+      var tds = tr.querySelectorAll('td');
+      if (tds.length === 5) {
+        rows.push([
+          tds[0].textContent.trim(),
+          tds[1].textContent.trim(),
+          tds[2].textContent.trim(),
+          tds[3].textContent.trim(),
+          tds[4].textContent.trim()
+        ]);
+      }
+    });
+
+    var csv = rows.map(function(r) { return r.map(function(c) { return '"' + c + '"'; }).join(','); }).join('\n');
+    var blob = new Blob([csv], { type: 'text/csv' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = currentProfile.full_name + '_grades.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── PROFILE ──
+  async function loadProfile() {
+    document.getElementById('profile-avatar').textContent = currentProfile.full_name.charAt(0).toUpperCase();
+    document.getElementById('profile-name').textContent = currentProfile.full_name;
+    document.getElementById('profile-email').textContent = ' ' + currentProfile.email;
+    document.getElementById('profile-matric').textContent = ' ' + currentProfile.matric_number + ' | Level: ' + currentProfile.level;
+    document.getElementById('edit-name').value = currentProfile.full_name;
+  }
+
+  async function updateProfile() {
+    var name = document.getElementById('edit-name').value.trim();
+    var msg = document.getElementById('profile-msg');
+
+    if (!name) { msg.textContent = 'Name cannot be empty.'; msg.className = 'message error'; return; }
+
+    var update = await supabaseClient.from('users').update({ full_name: name }).eq('id', currentUser.id);
+    if (update.error) { msg.textContent = 'Error: ' + update.error.message; msg.className = 'message error'; return; }
+
+    currentProfile.full_name = name;
+    msg.textContent = ' Profile updated!';
+    msg.className = 'message success';
+    loadProfile();
+    document.getElementById('student-info').textContent = name + ' | ' + currentProfile.level + ' | ' + currentProfile.matric_number;
+    document.getElementById('drawer-student-name').textContent = name + ' | ' + currentProfile.level;
+  }
+
+  async function changePassword() {
+    var newPass = document.getElementById('new-pass').value;
+    var confirm = document.getElementById('confirm-pass').value;
+    var msg = document.getElementById('password-msg');
+
+    if (!newPass || !confirm) { msg.textContent = 'Please fill in both fields.'; msg.className = 'message error'; return; }
+    if (newPass !== confirm) { msg.textContent = 'Passwords do not match.'; msg.className = 'message error'; return; }
+    if (newPass.length < 6) { msg.textContent = 'Password must be at least 6 characters.'; msg.className = 'message error'; return; }
+
+    var result = await supabaseClient.auth.updateUser({ password: newPass });
+    if (result.error) { msg.textContent = 'Error: ' + result.error.message; msg.className = 'message error'; return; }
+
+    msg.textContent = ' Password updated successfully!';
+    msg.className = 'message success';
+    document.getElementById('new-pass').value = '';
+    document.getElementById('confirm-pass').value = '';
   }
 
   async function logout() {
